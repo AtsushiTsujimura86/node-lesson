@@ -19,6 +19,7 @@ function Chat() {
             setLog((preLog) => [...preLog, data])
         })
         // Clean up the socket connection when the component unmounts
+        //reactのクリーンアップ関数、useEffectのreturnで行う、アンマウント時に実行される
         return () => {
             socket.off("receive_message");
         }

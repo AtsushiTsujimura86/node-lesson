@@ -2,7 +2,7 @@
 
 ## C++ → Node.jsの部分、HTTP.ver
 ### curlコマンドを使った方法
-curlコマンドを使って、HTTPのPOSTリクエストを行う。  
+curlコマンドを使って、HTTPのPOSTリクエストを行う。curlのコマンドをつかうため、環境に依存する。これはwindownsのpowershell
 2秒ごとにcurlコマンドを実行する。
 ``` cpp
 #include <cstdlib>
@@ -38,9 +38,11 @@ int main(){
 <br>
 
 
-### 
+### libcurlを使った方法
 ```
 
 ```
+#### 使用したライブラリ
+-  ```libcurl```： HTTP, HTTPS, FTP など多くの通信プロトコルに対応した C/C++ の外部ライブラリ。Windows・Linux・macOS すべてで使える。C++ネイティブでHTTP POSTができる（curl.exeを呼び出さない）
 <br>
 <br>

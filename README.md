@@ -222,29 +222,62 @@ mosquitto_pub -t "device/log" -m "Hello from MQTT"
 ### 🛠 組込み機器（C/C++）
 
 - UART（USBシリアル）でログを出力
-- 例：`printf("log: 1234\n");` など
+- 例：`SerialDebug.println();` 
 
 ---
+
+### MQTTブローカーの起動
+MSYS2 MINGQ64で`mosquitto -v`を実行してブローカーを起動 （後からNodeでブローカー作るかも）
 
 ### 🐍 Pythonスクリプト
 
 - `pyserial` でシリアルポートからログを受信
 - `paho-mqtt` を使って MQTT で送信
+- ```pip install pyserial paho-mqtt```でライブラリをインストールしておく
 
 ```python
 import serial
 import paho.mqtt.client as mqtt
 
-# シリアル設定
-ser = serial.Serial('COM3', 9600)
+SERIAL_PORT = 'COM12' # シリアルポートの設定
+BAUD_RATE = 9600 # ボーレートの設定
 
-# MQTTクライアント
+#MQTTブローカーの設定
+MQTT_BROKER = 'localhost'
+MQTT_PORT = 1883
+MQTT_TOPIC = 'device/log'
+
+try:
+    ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
+except Exception as e:
+    print(f"❌ シリアルポートのオープン中に例外が発生しました: {e}")
+    exit(1)
+
 client = mqtt.Client()
-client.connect("localhost", 1883)
+try:
+    result = client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    if result != 0:
+        print(f"❌ MQTTブローカーへの接続に失敗しました (コード: {result})")
+        ser.close()
+        exit(1)
+except Exception as e:
+    print(f"❌ MQTTブローカーへの接続中に例外が発生しました: {e}")
+    ser.close()
+    exit(1)
 
-while True:
-    line = ser.readline().decode('utf-8').strip()
-    client.publish("device/log", line)
+print(f" Serial → MQTT 接続中: {SERIAL_PORT} → mqtt://{MQTT_BROKER}:{MQTT_PORT}")
+
+try:
+    while True:
+        line = ser.readline().decode('utf-8').strip()
+        if line:
+            print(f"📤 送信: {line}")
+            client.publish(MQTT_TOPIC, line)
+except KeyboardInterrupt:
+    print("\n🛑 終了します。")
+finally:
+    ser.close()
+    client.disconnect()
 ```
 
 ---
@@ -253,6 +286,7 @@ while True:
 
 - `mqtt` で "device/log" を購読
 - `socket.io` でブラウザにプッシュ配信
+- ```npm install express cors mqtt socket.io```でインストール
 
 ```js
 const mqtt = require('mqtt');

@@ -150,7 +150,7 @@ Publisher（送信） → Broker（中継） → Subscriber（受信）
 
 ---
 
-## ✅ 5. ツジムラさんの構成例（リアルタイムログ）
+## ✅ 5.構成例（リアルタイムログ）
 
 ```text
 [C++（Publisher）]
